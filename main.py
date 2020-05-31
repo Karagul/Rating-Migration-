@@ -2,7 +2,7 @@
 """
 Created on Tue May 19 10:22:11 2020
 
-@author: U0047365
+@author: Sardor Mirzaev
 """
 import os
 import pandas as pd
@@ -13,15 +13,12 @@ import aa02 as a2
 import aa03 as a3
 import aa04 as a4
 import importlib as load
-load.reload(a1)
-load.reload(a2)
-load.reload(a3)
-load.reload(a4)
-os.chdir("N:/506/5060/99 Sonstiges/Einarbeitung Sardor/Kopie.2019_LGD_Validierung/_Python") 
+
+os.chdir("") 
 #%%
 ############################################## 
 
-import1= 'MigrationenTool TRO v_2019(1)_eng.xlsx' # Datei auswählen
+import1= 'sample01.xlsx' # Datei auswählen
 
 ###############################################
 
@@ -48,7 +45,7 @@ dataframe=pd.DataFrame(df,columns=['valid_from','valid_to','rating_grade','ratin
   one can make a loop through enddates and begin dates 
   in t  and save i th rating reports in separte dicts   
 '''
-AnzHist=13
+AnzHist=13 # for simplicity  I take here 13 month range. 
 sortedshort1={}
 shorted21={}
 shorted22={}
