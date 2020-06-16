@@ -3,19 +3,33 @@
 Created on Thu May 28 14:21:25 2020
 
 @author: U0047365
+"""
 
 
- Function rating_counter --
- Dataframe variable should be  given after sorting and 
- filtering    operations from main file.
- The Variable is a dict containing pd.Dataframe type data in values) 
-  count the number of ratings in each class   
- """
-#    #Verlauf Tabellenblatt B9:B32  
 
-def rating_counter(dataframe):         
+
+def rating_counter(dataframe,AnzHist,t_endedates):
+    """    
+     Function rating_counter --
+     Dataframe variable should be  given after sorting and 
+     filtering    operations from main file.
+     The Variable is a dict containing pd.Dataframe type data in values) 
+     count the number of ratings in each class   
+     """
+     #    #Verlauf Tabellenblatt B9:B32  
+   
+    selection=[1,3,11]
+    
+    shorted21=dict()
+    for i in range (0,AnzHist):
+        shorted21[i]=dataframe[(dataframe.valid_to>t_endedates[i+1])\
+                &(dataframe.valid_from<=t_endedates[i+1])]    
+    
+    rating_counter.shorted21=shorted21  # used in aa3.py expired_ratings()        
+
+    print("Calculation started")      
     vert_3=dict()
-    for key,j in dataframe.items():
+    for key,j in shorted21.items():
         
         vert_3[key]={}
         for k in j.rating_grade:
@@ -28,12 +42,15 @@ def rating_counter(dataframe):
                
                 else:
                     pass
-        
-    return vert_3
+    ratings_by=[sum(list(vert_3[i].values())) for i in selection]
+                        #for i in range(AnzHist) for all timeframe
+    
+    print("Calculation finished") 
+    return vert_3, ratings_by
     
 #%%
 
-def plot_barchart(dicted_data,enddates):
+def plot_barchart(output_rating_counter0,enddates):
     """
     as t_endedates the  list of datetime.datetime type 
     of variables shoud be given 
@@ -47,7 +64,7 @@ def plot_barchart(dicted_data,enddates):
     import numpy as np
     
     t_endedates=enddates
-    vert_3=dicted_data
+    vert_3=output_rating_counter0
     fig, ax=plt.subplots(figsize=(19,6))
     labels=["AAAA","AAA", "AA+","AA","AA-","A+","A", "A-", "2",\
              "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",\
@@ -75,14 +92,14 @@ def plot_barchart(dicted_data,enddates):
 
 #%%
 
-def reporting_0(dicted_data):
+def rating_grade_report(output_rating_counter0):
     '''
     returns to the  rating classes of latest observed timeframe 
     Input variables  are initially calculated 
     from main file and after are passed to this function
     '''
     import pandas as pd 
-    vert_3=dicted_data
+    vert_3=output_rating_counter0
     
 # Report Tabellenblatt G18
     labels=["AAAA","AAA", "AA+","AA","AA-","A+","A", "A-", "2",\
@@ -108,7 +125,7 @@ def reporting_0(dicted_data):
 
 #%%
    
-def reporting_1 (dicted_data, enddates): 
+def ref_date_report(output_rating_counter0, enddates): 
     '''
     returns to a wighted PD  ratios and assigns to nearest
     PD rating class
@@ -121,9 +138,10 @@ def reporting_1 (dicted_data, enddates):
     # Report Tabellenblatt G22
     # reference date
     import pandas as pd    
-    vert_3=dicted_data
+    vert_3=output_rating_counter0
     t_endedates=enddates
     ratio={}
+    
     pd_zu_stufe=[0,0.0001,0.0002,0.0003,0.0004,0.0005,0.0007,
                      0.0009, 0.0011561, 0.00173415, 0.00260123,
                      0.00390184,0.00585277,0.00877915, 0.01316872,
@@ -145,7 +163,10 @@ def reporting_1 (dicted_data, enddates):
             
             if  l+0.005>=j>=l-0.005:
                 grade.append(k-6)
-    year=12           
+    year=12 
+   
+    global refdate  #allows to call this variable in another funciton
+    
     refdate=[t_endedates[i].date() for i in [1,2,4,1+year]]
     
     selection=[0,1,3,12]
@@ -162,7 +183,7 @@ def reporting_1 (dicted_data, enddates):
     # Report Tabellenblatt G26
     #number of ratings (total) 
     
-def reporting_2(dicted_data,dicted_alives, enddates, AnzHist):
+def total_perfm_nonperfm(output_rating_counter0,dataframe, end_dates, AnzHist):
     """
     dicted_data is the same type of variable as output from \
     rating_counter  function
@@ -174,14 +195,20 @@ def reporting_2(dicted_data,dicted_alives, enddates, AnzHist):
     after are passed to this function
     
     """
-    import pandas as pd    
-    vert_3=dicted_data
-    t_endedates=enddates
+    import pandas as pd 
+    selection=[0,1,3,12]
+    vert_3=output_rating_counter0
+    t_endedates=end_dates
+    sort={}   
+    for i in range (0,AnzHist):    
+        sort[i]= dataframe[(dataframe.valid_to>t_endedates[i+1])\
+            &(dataframe.valid_from<=t_endedates[i+1])\
+            &(dataframe.rating_grade<22)]    
     
     table_number=[sum(i.values()) for k, i in vert_3.items()]
     
     perf_num=[sum(list(i.values())[:22]) for k, i in vert_3.items()]
-    selection=[0,1,3,12]
+    
     non_perf_num=[a-b for a, b in zip(table_number,perf_num)]
     num_1=[table_number[i] for i in selection]
     
@@ -192,19 +219,17 @@ def reporting_2(dicted_data,dicted_alives, enddates, AnzHist):
     num_3=[non_perf_num[i] for i in selection]
     num_3_1=["{:.2%}".format(a/b) for a,b in zip(num_3,num_1)]
     
-    year=12           
-    refdate=[t_endedates[i].date() for i in [1,2,4,1+year]]
+    global refdate          
     
     result2=pd.DataFrame([num_1, num_2,num_2_1,num_3,num_3_1],\
     columns=refdate)
-    result2.index=['number of ratings (total)','number of ratings (performing)',  'in %',\
-                    'number of ratings (non-performing)',  'in %',  ] 
+    result2.index=['number of ratings (total)','number of ratings (performing)',\
+                'in %', 'number of ratings (non-performing)',  'in %',  ] 
 
     # Report Tabellenblatt G30
-    #age of ratings (performing; days)
-    smort=dicted_alives 
+    #age of ratings (performing; days) 
     for i in range (0,AnzHist):
-        for key,j in smort.items():
+        for key,j in sort.items():
             if i==key:
                 j['xxx']=t_endedates[i+1]-j['valid_from']  
             else:
@@ -212,14 +237,18 @@ def reporting_2(dicted_data,dicted_alives, enddates, AnzHist):
     ras=[]
     selection=[0,1,3,12]
     for i in selection:
-        for k,j in smort.items():
+        for k,j in sort.items():
             if i == k:
                 ras.append(j['xxx'].dt.days.sum())
     
     result3=[p/q for p,q in zip(ras,num_2)] 
+    
     age=[round(i) for i in result3]
+    
+    
     result001=pd.DataFrame(age,columns=['age of ratings( performing days)'])
     result01=result001.T 
+    result01.columns=refdate
     
     return  result2, result01
 
@@ -227,8 +256,8 @@ def reporting_2(dicted_data,dicted_alives, enddates, AnzHist):
 if __name__=="__main__":
     rating_counter()
     plot_barchart()
-    reporting_0()
-    reporting_1()
-    reporting_2()
+    rating_grade_report()
+    ref_date_report()
+    total_perfm_nonperfm()
     
 print("Completed.")
