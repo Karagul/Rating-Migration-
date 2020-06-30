@@ -168,14 +168,14 @@ def abwechslung(dataframe,include_5_notch):
                     pass
             else:
                 pass
-            qs1=pd.DataFrame([count00,count0,count1,count2,count3,count,\
-                            count4,count5,count6,count7,count77],columns=['Anzahl'])
+            qs1=pd.DataFrame([count0,count1,count2,count3,count,\
+                            count4,count5,count6,count7],columns=['Anzahl'])
             qs1.index=[\
-            'Verschlechterung um mind. 5 Klassen','Verschlechterung um mind. 4 Klassen',\
+            'Verschlechterung um mind. 4 Klassen',\
             'Verschlechterung um mind. 3 Klassen','Verschlechterung um mind. 2 Klassen',\
             'Verschlechterung um mind. 1 Klasse','Gleichheit', \
             'Verbesserung um 1 Klasse','Verbesserung um 2 Klassen',\
-            'Verbesserung um 3 Klassen','Verbesserung um 4 Klassen','Verbesserung um 5 Klassen']
+            'Verbesserung um 3 Klassen','Verbesserung um 4 Klassen']
         else:
             pass
     return qs1
