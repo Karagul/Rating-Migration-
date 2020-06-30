@@ -105,7 +105,7 @@ for k,i in expired_ratings.iterrows():
 load.reload(a4)
 
 #Report  T39:Z42  
-# returns to each expired ratings in last 3 months  and one year range
+# returns to each expired ratings in last month, last 3 months  and one year range
 
 exclude_def,exclude_def_4,down_up_grades =a4.migrated_alives(cum_all,all_up_down,AnzHist)
 
